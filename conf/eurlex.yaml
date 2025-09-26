@@ -1,0 +1,3 @@
+data:
+  dataset_name: eurlex57k
+  dataset_url: http://nlp.cs.aueb.gr/software_and_datasets/EURLEX57K/datasets.zip
