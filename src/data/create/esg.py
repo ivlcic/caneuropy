@@ -50,8 +50,8 @@ def load_data(state: DateTimeState):
         if not industries:
             continue
 
-        item['companies'] = industries.values()
-        item['company_uuid'] = industries.keys()
+        item['companies'] = list(industries.values())
+        item['company_uuid'] = list(industries.keys())
 
         state.runtime_data.items.append(item)
         if state.runtime_data.num_items_per_file == len(state.runtime_data.items):

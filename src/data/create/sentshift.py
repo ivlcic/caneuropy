@@ -40,7 +40,7 @@ def write(state: DateTimeState):
 def load_data(state: DateTimeState):
     req = ElasticQuery(state.data_args.dataset_src_url, state.data_args.dataset_src_user)
     query_desc: Dict[str, Any] = state.data_args.dataset_src_query
-
+    logger.info(f"Processing {state.progress:.2f} @ step [{state.step_start} <=> {state.step_end}] / {state.end}")
     for category, keywords in query_desc['keywords'].items():
         query = query_desc['template']
         keywords_str = ",\n".join(f'{{ "match_phrase": {{ "text": "{item}" }} }}' for item in keywords)
@@ -59,8 +59,6 @@ def load_data(state: DateTimeState):
             if not contains_any(text, keywords):
                 continue
             state.runtime_data.items.append(item)
-            if len(state.runtime_data.items) % 1000 == 0:
-                logger.info(f"Processing {state.progress:.2f} @ step {state.step_start} / {state.end}")
             if state.runtime_data.num_items_per_file == len(state.runtime_data.items):
                 write(state)
 
@@ -73,7 +71,7 @@ def main(data_args : DataArguments) -> None:
     for state in DateTimeIterator(
         start=data_args.dataset_src_start,
         end=data_args.dataset_src_end,
-        step=timedelta(hours=3),
+        step=timedelta(days=10),
         callback=load_data,
         data_args=data_args,
         runtime_data=runtime
