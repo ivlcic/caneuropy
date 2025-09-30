@@ -1,0 +1,75 @@
+from datetime import timedelta
+from typing import Dict, Any
+
+from .common import sanitize_es_result, write_to_file
+from ...appcli.data_args import DataArguments
+from ...appcli.elastic_query import ElasticQuery
+from ...appcli.iterators import DateTimeIterator, DateTimeState, RuntimeData
+
+
+def write(state: DateTimeState):
+    global paths
+    data_create_path = paths['create']['data']
+    file_name = state.data_args.dataset_name + f"-{state.runtime_data.file_num:02d}"
+    write_to_file(
+        state.runtime_data.items,
+        data_create_path,
+        file_name
+    )
+    logger.info("Writing data to %s", data_create_path)
+    state.runtime_data.file_num += 1
+    state.runtime_data.items = []
+
+
+def load_data(state: DateTimeState):
+    req = ElasticQuery(state.data_args.dataset_src_url, state.data_args.dataset_src_user)
+    query_desc: Dict[str, Any] = state.data_args.dataset_src_query
+
+    # for category, keywords in query_desc['keywords'].items():
+    query = query_desc['template']
+    industries_map = query_desc['industry_map']
+    valid_industry_uuids = set(industries_map.keys())
+    logger.info(f"Processing {state.progress:.2f} @ step [{state.step_start} <=> {state.step_end}] / {state.end}")
+    results, total = req.query(query, state.step_start, state.step_end)
+    for result in results:
+        item = sanitize_es_result(result)
+        if item is None:
+            continue
+
+        industries = {}
+        if not 'tags' in result:
+            continue
+
+        for tag in result['tags']:
+            if not 'class' in tag or not tag['class'].endswith('.CustomerTopicGroup'):
+                continue
+            if tag['uuid'] not in valid_industry_uuids:
+                continue
+            industries[tag['uuid']] = industries_map[tag['uuid']]
+
+        if not industries:
+            continue
+
+        item['companies'] = industries.values()
+        item['company_uuid'] = industries.keys()
+
+        state.runtime_data.items.append(item)
+        if state.runtime_data.num_items_per_file == len(state.runtime_data.items):
+            write(state)
+
+
+def main(data_args : DataArguments) -> None:
+    # noinspection PyGlobalUndefined
+    global logger, paths
+    logger.info(f"Downloading {data_args.dataset_name}")
+    runtime = RuntimeData()
+    for state in DateTimeIterator(
+        start=data_args.dataset_src_start,
+        end=data_args.dataset_src_end,
+        step=timedelta(days=10),
+        callback=load_data,
+        data_args=data_args,
+        runtime_data=runtime
+    ):
+        # logger.info(f"Processing {state.progress:.2f} @ step {state.step_start} / {state.end}")
+        pass

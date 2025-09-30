@@ -9,7 +9,7 @@ import logging.config
 from dataclasses import fields
 from logging import Logger
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 import yaml
 from transformers import HfArgumentParser, TrainingArguments
@@ -58,8 +58,8 @@ def list_names(src: Path, script: str, sub_action: str) -> List[str]:
             names.append(child.stem)
     return sorted(names)
 
-def _module_exists(module_path: str) -> bool:
-    return importlib.util.find_spec(module_path) is not None
+def _module_exists(module_path: str, package: Union[str, None] = None) -> bool:
+    return importlib.util.find_spec(module_path, package) is not None
 
 # ---------------------------
 # YAML loading and merge
@@ -259,20 +259,21 @@ def _inject_module_globals(module, g: Dict[str, Any]) -> None:
 
 def _call_module(script: str, sub_action: str, name: str | None, module_globals: Dict[str, Any]) -> int:
     # Try verb.subaction.name first if name present and module exists
+    base_dir = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
     fn = None
     mod = None
     if name:
-        mod_path = f"{script}.{sub_action}.{name}"
-        if _module_exists(mod_path):
-            mod = importlib.import_module(mod_path)
+        mod_name = f"{base_dir}.{script}.{sub_action}.{name}"
+        if _module_exists(mod_name):
+            mod = importlib.import_module(mod_name)
             fn = getattr(mod, "main", None)
         else:
             pkg_path = f"{script}.{sub_action}"
-            if _module_exists(pkg_path):
+            if _module_exists(pkg_path, None):
                 mod = importlib.import_module(pkg_path)
                 fn = getattr(mod, name, None)
     else:
-        pkg_path = f"{script}.{sub_action}"
+        pkg_path = f"{base_dir}.{script}.{sub_action}"
         if _module_exists(pkg_path):
             mod = importlib.import_module(pkg_path)
             fn = getattr(mod, "main", None)
@@ -328,9 +329,7 @@ def main(argv: List[str]) -> int:
         "data_args": data_args,
         "training_args": training_args,
         "extra_args": extras,
-        "paths": {
-            **{k: str(v) for k, v in run_dirs.items()},
-        },
+        "paths": run_dirs,
         "logger": logger,
     }
 
