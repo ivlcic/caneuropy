@@ -19,5 +19,5 @@ pip install -r requirements.txt
 ```
 
 ```shell
-./data create sentshift
+./data create ml-kw-match
 ```

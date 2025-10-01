@@ -93,8 +93,8 @@ data:
           }
         },
         "_source": [
-          "uuid", "created", "published", "tags", "media.name", "media.uuid", "media.tags",
-          "mediaReach", "advertValue", "country.name", "language", "translations"
+          "uuid", "created", "published", "tags", "media.name", "media.uuid", "media.tags", "country.name", "language", 
+          "rubric.uuid", "rubric.name", "duration", "mediaReach", "advertValue", "translations", "url"
         ],
         "from": <from>,
         "size": <size>,

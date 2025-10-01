@@ -1,8 +1,8 @@
 data:
-  dataset_name: sentshift
+  dataset_name: ml-kw-match
   dataset_src_url: https://c1-infra.clippitamine.systems/elastic/article/_search
   dataset_src_user: admin
-  dataset_src_start: 2015-01-01
+  dataset_src_start: 2005-01-01
   dataset_src_end: 2025-01-01
   dataset_src_query:
     template: |
@@ -26,8 +26,8 @@ data:
           }
         },
         "_source": [
-          "uuid", "created", "published", "tags", "media.name", "media.uuid", "media.tags",
-          "mediaReach", "advertValue", "country.name", "language", "translations"
+          "uuid", "created", "published", "tags", "media.name", "media.uuid", "media.tags", "country.name", "language", 
+          "rubric.uuid", "rubric.name", "duration", "mediaReach", "advertValue", "translations", "url"
         ],
         "from": "<from>",
         "size": "<size>",
@@ -196,11 +196,6 @@ data:
         - Фолксвагеном
         - Фолксвагене
         - Фолксвагену
-        - ВВ
-        - ВВа
-        - ВВу
-        - ВВом
-        - ВВе
         - Фолксвагенот
         - Фолксвагени
       global_warming:

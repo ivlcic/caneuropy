@@ -1,8 +1,10 @@
+import regex
 import csv
 import json
 from pathlib import Path
 from typing import Dict, Any, Union, List
 
+__SOURCE_PATT = regex.compile(r'^[\p{Nd}\p{Lu}\s]+(?:[,\s]+)?(?:\s*(\d{1,2}\.\s*\d{1,2}\.\s*\d{4})(?:[,\s]+)?(?:\s*\p{Lu}{2,}[\p{Nd}\p{Lu}\s]+(?:[,\s]+)?(?:\s*\d{1,2}[:.]\d{2})?)?)?\s*$')
 
 def write_to_file(items: List[Dict[str, Any]], path: Union[str, Path], file_name: str) -> None:
     if not items:
@@ -47,14 +49,26 @@ def sanitize_es_result(result: Dict[str, Any], append: Dict[str, Any] = None) ->
     translation = result['translations'][language]
     if 'title' not in translation:
         return None
+    title = translation['title'].strip()
 
     body = ''
     if 'body' in translation:
         body = translation['body']
 
+    body = body.replace(url, '').strip()
+
+    if body.startswith(title):
+        body = body[len(title):].strip()
+
     country = ''
     if 'country' in result and 'name' in result['country']:
         country = result['country']['name']
+
+    section = ''
+    section_uuid = ''
+    if 'rubric' in result and 'name' in result['rubric']:
+        section = result['rubric']['name']
+        section_uuid = result['rubric']['uuid']
 
     media_type = ''
     if 'tags' in media:
@@ -62,7 +76,15 @@ def sanitize_es_result(result: Dict[str, Any], append: Dict[str, Any] = None) ->
             if 'class' in tag and 'name' in tag and tag['class'].endswith('MediaType'):
                 media_type = tag['name']
 
-    title = translation['title']
+    if 'tv' == media_type or 'radio' == media_type:
+        lines = body.split("\n")
+        if len(lines) > 1:
+            match = __SOURCE_PATT.match(lines[0])
+            if match is not None:
+                body = "\n".join(lines[1:])
+
+    body = body.strip()
+
     out = {}
     out['uuid'] = result['uuid']
     out['created'] = created
@@ -75,6 +97,8 @@ def sanitize_es_result(result: Dict[str, Any], append: Dict[str, Any] = None) ->
 
     out['media_uuid'] = media['uuid']
     out['media_name'] = media['name']
+    out['section_uuid'] = section_uuid
+    out['section_name'] = section
     out['media_type'] = media_type
     out['country'] = country
     out['language'] = language
