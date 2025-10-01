@@ -40,7 +40,6 @@ def write(state: DateTimeState):
 def load_data(state: DateTimeState):
     req = ElasticQuery(state.data_args.dataset_src_url, state.data_args.dataset_src_user)
     query_desc: Dict[str, Any] = state.data_args.dataset_src_query
-    logger.info(f"Processing {state.progress:.2f} @ step [{state.step_start} <=> {state.step_end}] / {state.end}")
     items_batch = {}
     for category, keywords in query_desc['keywords'].items():
         query = query_desc['template']
@@ -88,7 +87,6 @@ def main(data_args : DataArguments) -> None:
         data_args=data_args,
         runtime_data=runtime
     ):
-        # logger.info(f"Processing {state.progress:.2f} @ step {state.step_start} / {state.end}")
-        pass
+        logger.info(f"Processed {state.progress:.2f} @ step [{state.step_start} <=> {state.step_end}] / {state.end}")
     if state:
         write(state)
