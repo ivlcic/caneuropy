@@ -26,7 +26,7 @@ def contains_any(text: str, keywords: list[str]) -> bool:
 def write(state: DateTimeState):
     global paths
     data_create_path = paths['create']['data']
-    file_name = state.data_args.dataset_name + f"-{state.runtime_data.file_num:03d}"
+    file_name = state.data_args.dataset_name + f"-{state.runtime_data.file_num:02d}"
     write_to_file(
         state.runtime_data.items,
         data_create_path,
@@ -78,7 +78,7 @@ def main(data_args : DataArguments) -> None:
     # noinspection PyGlobalUndefined
     global logger, paths
     logger.info(f"Downloading {data_args.dataset_name}")
-    runtime = RuntimeData(num_items_per_file=10000)
+    runtime = RuntimeData(num_items_per_file=50000)
     state = None
     for state in DateTimeIterator(
         start=data_args.dataset_src_start,
