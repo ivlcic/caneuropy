@@ -6,7 +6,7 @@ The dataset is available in both JSON lines and CSV formats for convenience.
 
 ## Selected keywords
 
-### United States
+### The United States
 
 - USA
 - U.S.A.
@@ -59,7 +59,7 @@ The dataset is available in both JSON lines and CSV formats for convenience.
 - Северно атлантски сојуз
 - Северно атлантскиот сојуз
 
-### The Tesla Automotive Company
+### Tesla - Automotive Company
 
 - Tesla
 - TESLA
@@ -99,7 +99,7 @@ The dataset is available in both JSON lines and CSV formats for convenience.
 - Теслана
 - ТЕСЛАНА
 
-### IKEA, The furniture company
+### IKEA - The furniture company
 
 - Ikea
 - IKEa
@@ -136,7 +136,7 @@ The dataset is available in both JSON lines and CSV formats for convenience.
 - Икејa
 - ИКЕЈА
 
-### Volkswagen
+### Volkswagen - Automotive Company
 
 - Volkswagen
 - Volkswagna
@@ -166,7 +166,7 @@ The dataset is available in both JSON lines and CSV formats for convenience.
 - Фолксвагенот
 - Фолксвагени
 
-### Global Warming
+### Global Warming - General Concept
 
 - globalno segrevanje
 - globalnega segrevanja
@@ -219,6 +219,17 @@ Each news article has the following fields:
   "url": "",
   "body": "Nectar Je 2003. u pogon za proizvodnju koncentrata i kaša investirao dva milijuna eura NOVI SAD U pogonima kompanije Nectar u Bačkoj Palanci lani je preradeno više od 100.000 tona raznog voča, a proizvodi od njega plasirani su od Hong Konga preko Australije do SAD ..."
 }
+```
+
+The categories are:
+
+```
+zda
+nato
+tesla
+ikea
+volkswagen
+global_warming
 ```
 
 Notes:
