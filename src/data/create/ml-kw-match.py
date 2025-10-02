@@ -61,9 +61,12 @@ def load_data(state: DateTimeState):
             if not contains_any(text, keywords):
                 continue
 
+            # we already hit other category with the same item
             if result['uuid'] in items_batch:
                 items_batch[result['uuid']]['categories'].append(category)
                 continue
+
+            # first time hit item
             items_batch[result['uuid']] = item
 
     for k, item in items_batch.items():

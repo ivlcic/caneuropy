@@ -25,16 +25,112 @@ data:
       6a996b7c-b8ea-4aa9-ab67-d8d558d1cba4: n1info.si
       29213ab4-199c-4b11-aa64-eaa37092adf6: rtvslo.si
     industry_map:
-      ec4c9172-b612-3e0e-809b-72dbfbfb23f3: Talum
-      f5f73321-fe7e-34b4-b701-6b41a999f512: SDH - Slovenski državni holding
-      1c4a5d3e-c0f1-3b6a-9b98-610c13505f0a: Združenje nadzornikov Slovenije
-      648d1735-61b5-3f67-b9f5-413596acfe25: NLB
-      74a43247-0343-3a8d-9d5c-b046d90308c1: Salonit Anhovo (Renamed to Alpacem)
-      c5dd0ca4-4951-3cd3-915a-3de7993042f7: Slovenske železnice
-      9612f51c-947b-38b4-98cb-bb06c9a9c07d: SIJ - Slovenska industrija jekla
-      0f7bce51-1fd4-3bc7-b1bb-210442570e2f: Zavarovalnica Triglav
-      829826a3-0221-3b41-8364-102835c4dfb7: Telekom Slovenije
-      6318f134-93e2-30d2-b047-63c61e1471e7: Cinkarna Celje
+      ec4c9172-b612-3e0e-809b-72dbfbfb23f3: talum
+      f5f73321-fe7e-34b4-b701-6b41a999f512: sdh
+      1c4a5d3e-c0f1-3b6a-9b98-610c13505f0a: zns
+      648d1735-61b5-3f67-b9f5-413596acfe25: nlb
+      74a43247-0343-3a8d-9d5c-b046d90308c1: salonit
+      c5dd0ca4-4951-3cd3-915a-3de7993042f7: sž
+      9612f51c-947b-38b4-98cb-bb06c9a9c07d: sij
+      0f7bce51-1fd4-3bc7-b1bb-210442570e2f: triglav
+      829826a3-0221-3b41-8364-102835c4dfb7: telekom
+      6318f134-93e2-30d2-b047-63c61e1471e7: cinkarna
+    industry_match:
+      talum:
+        uuid: ec4c9172-b612-3e0e-809b-72dbfbfb23f3
+        keywords:
+          - talum*
+      sdh:
+        uuid: f5f73321-fe7e-34b4-b701-6b41a999f512
+        keywords:
+          - SDH
+        expressions:
+          - slovensk* držav* holding*
+      zns:
+        uuid: 1c4a5d3e-c0f1-3b6a-9b98-610c13505f0a
+          - združenj* nadzornik* sloveni*
+      nlb:
+        uuid: 648d1735-61b5-3f67-b9f5-413596acfe25
+        keywords:
+          - NLB
+        expression:
+          - nov* ljubjansk* bank*
+      salonit:
+        uuid: 74a43247-0343-3a8d-9d5c-b046d90308c1
+        expressions:
+          - salonit* anhov*
+          - alpacem*
+      sž:
+        uuid: c5dd0ca4-4951-3cd3-915a-3de7993042f7
+        expressions:
+          - slovensk* železnic*
+        keywords:
+          - SŽ
+      sij:
+        uuid: 9612f51c-947b-38b4-98cb-bb06c9a9c07d
+        keywords:
+          - SIJ
+        expressions:
+          - slovensk* industrij* jekla
+      triglav:
+        uuid: 0f7bce51-1fd4-3bc7-b1bb-210442570e2f
+        expressions:
+          - zavarovaln* triglav*
+          - triglav* zavarovaln*
+      telekom:
+        uuid: 829826a3-0221-3b41-8364-102835c4dfb7
+        expressions:
+          - telekom* sloven*
+      cinkarna:
+        uuid: 6318f134-93e2-30d2-b047-63c61e1471e7
+        expressions:
+          - cinkarn* celje*
+      steklarna:
+        uuid: 918ceb8d-ff6e-4a3c-a5f3-e2d1ff61f990  # synthetic
+        expressions:
+          - steklarn* hrastnik*
+      sava:
+        uuid: 918ceb8d-ff6e-4a3c-a5f3-e2d1ff61f991  # synthetic
+        expressions:
+          - zavarovaln* sav*
+      otp:
+        uuid: 918ceb8d-ff6e-4a3c-a5f3-e2d1ff61f992  # synthetic
+        expressions:
+          - otp* bank*
+        keywords:
+          - OTP
+      pošta:
+        uuid: 918ceb8d-ff6e-4a3c-a5f3-e2d1ff61f993  # synthetic
+        expressions:
+          - pošt* sloven*
+      petrol:
+        uuid: 918ceb8d-ff6e-4a3c-a5f3-e2d1ff61f994  # synthetic
+        keywords:
+          - Petrol*
+          - PETROL*
+      trbovlje:
+        uuid: 918ceb8d-ff6e-4a3c-a5f3-e2d1ff61f995  # synthetic
+        keywords:
+          - RTH
+        expressions:
+          - rudnik* trbovlj* hrastnik*
+          - rudnik* trbovlj*
+      šoštanj:
+        uuid: 918ceb8d-ff6e-4a3c-a5f3-e2d1ff61f996  # synthetic
+        keywords:
+          - TEŠ
+        expressions:
+          - termoelektrarn* šoštanj*
+      sid:
+        uuid: 918ceb8d-ff6e-4a3c-a5f3-e2d1ff61f997  # synthetic
+        keywords:
+          - SID
+        expressions:
+          - sid* bank*
+      intereuropa:
+        uuid: 918ceb8d-ff6e-4a3c-a5f3-e2d1ff61f998  # synthetic
+        keywords:
+          - intereurop*
     template: |
       {
         "query": {
@@ -46,22 +142,6 @@ data:
                     "gte": "<date_start>",
                     "lt": "<date_end>"
                   }
-                }
-              },
-              {
-                "terms": {
-                  "tags.uuid": [
-                    "ec4c9172-b612-3e0e-809b-72dbfbfb23f3",
-                    "f5f73321-fe7e-34b4-b701-6b41a999f512",
-                    "1c4a5d3e-c0f1-3b6a-9b98-610c13505f0a",
-                    "648d1735-61b5-3f67-b9f5-413596acfe25",
-                    "74a43247-0343-3a8d-9d5c-b046d90308c1",
-                    "c5dd0ca4-4951-3cd3-915a-3de7993042f7",
-                    "9612f51c-947b-38b4-98cb-bb06c9a9c07d",
-                    "0f7bce51-1fd4-3bc7-b1bb-210442570e2f",
-                    "829826a3-0221-3b41-8364-102835c4dfb7",
-                    "6318f134-93e2-30d2-b047-63c61e1471e7"
-                  ]
                 }
               },
               {
@@ -89,7 +169,11 @@ data:
                   ]
                 }
               }
-            ]
+            ],
+            "should": [
+              <should_match>
+            ],
+            "minimum_should_match": 1
           }
         },
         "_source": [
