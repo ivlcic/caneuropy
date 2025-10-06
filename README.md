@@ -1,5 +1,5 @@
-# caneuropy
-Simple ML research framework
+# CaNNopy
+Simple ML research framework that focuses on repeatability and supports flexible diversity of tasks. 
 
 ```shell
 python -m venv .venv && source .venv/bin/activate
