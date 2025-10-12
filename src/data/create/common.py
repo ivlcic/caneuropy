@@ -4,7 +4,9 @@ import json
 from pathlib import Path
 from typing import Dict, Any, Union, List
 
-__SOURCE_PATT = regex.compile(r'^[\p{Nd}\p{Lu}\s]+(?:[,\s]+)?(?:\s*(\d{1,2}\.\s*\d{1,2}\.\s*\d{4})(?:[,\s]+)?(?:\s*\p{Lu}{2,}[\p{Nd}\p{Lu}\s]+(?:[,\s]+)?(?:\s*\d{1,2}[:.]\d{2})?)?)?\s*$')
+__SOURCE_PATT = regex.compile(r'^[\p{Nd}\p{Lu}\s]+(?:[,\s]+)?(?:\s*(\d{1,2}\.\s*\d{1,2}\.\s*\d{4})(?:[,'
+                              r'\s]+)?(?:\s*\p{Lu}{2,}[\p{Nd}\p{Lu}\s]+(?:[,\s]+)?(?:\s*\d{1,2}[:.]\d{2})?)?)?\s*$')
+
 
 def write_to_file(items: List[Dict[str, Any]], path: Union[str, Path], file_name: str) -> None:
     if not items:
@@ -85,12 +87,8 @@ def sanitize_es_result(result: Dict[str, Any], append: Dict[str, Any] = None) ->
 
     body = body.strip()
 
-    out = {}
-    out['uuid'] = result['uuid']
-    out['created'] = created
-    out['published'] = published
-
-    # insert my_dict right after 'published'
+    out = {'uuid': result['uuid'], 'created': created, 'published': published}
+    # insert the "append" dictionary data right after 'published'
     if append:
         for k, v in append.items():
             out[k] = v

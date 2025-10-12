@@ -3,15 +3,15 @@ from datetime import timedelta
 from typing import Dict, Any
 
 from .common import sanitize_es_result, write_to_file
-from ...appcli.data_args import DataArguments
-from ...appcli.elastic_query import ElasticQuery
-from ...appcli.iterators import DateTimeIterator, DateTimeState, RuntimeData
+from ...app.args.data import DataArguments
+from ...app.elastic_query import ElasticQuery
+from ...app.iterators import DateTimeIterator, DateTimeState, RuntimeData
 
 
 def contains_any(text: str, keywords: list[str]) -> bool:
     for kw in keywords:
         if kw.islower():
-            # Case-insensitive check for fully-lowercase keywords
+            # Case-insensitive check for fully lowercase keywords
             pat = re.compile(rf"\b{re.escape(kw)}\b", flags=re.IGNORECASE)
             if pat.search(text):
                 return True
@@ -23,6 +23,7 @@ def contains_any(text: str, keywords: list[str]) -> bool:
     return False
 
 
+# noinspection PyUnresolvedReferences,DuplicatedCode,PyGlobalUndefined
 def write(state: DateTimeState):
     global paths
     data_create_path = paths['create']['data']
@@ -37,6 +38,7 @@ def write(state: DateTimeState):
     state.runtime_data.items = []
 
 
+# noinspection PyUnresolvedReferences
 def load_data(state: DateTimeState):
     req = ElasticQuery(state.data_args.dataset_src_url, state.data_args.dataset_src_user)
     query_desc: Dict[str, Any] = state.data_args.dataset_src_query
@@ -61,7 +63,7 @@ def load_data(state: DateTimeState):
             if not contains_any(text, keywords):
                 continue
 
-            # we already hit other category with the same item
+            # we already hit the other category with the same item
             if result['uuid'] in items_batch:
                 items_batch[result['uuid']]['categories'].append(category)
                 continue
@@ -75,9 +77,8 @@ def load_data(state: DateTimeState):
             write(state)
 
 
-
-def main(data_args : DataArguments) -> None:
-    # noinspection PyGlobalUndefined
+# noinspection PyUnresolvedReferences,DuplicatedCode,PyGlobalUndefined
+def main(data_args: DataArguments) -> None:
     global logger, paths
     logger.info(f"Downloading {data_args.dataset_name}")
     runtime = RuntimeData(num_items_per_file=50000)

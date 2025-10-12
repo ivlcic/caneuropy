@@ -3,6 +3,7 @@ from datetime import datetime, date, timezone
 from dateutil import parser
 from dateutil.tz import tzlocal
 
+
 def to_datetime(value: Union[str, datetime, date]) -> datetime:
     if isinstance(value, datetime):
         dt = value
@@ -13,6 +14,7 @@ def to_datetime(value: Union[str, datetime, date]) -> datetime:
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=tzlocal())
     return dt
+
 
 def to_zulu_str(dt: datetime) -> str:
     dt_utc = dt.astimezone(timezone.utc)

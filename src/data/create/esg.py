@@ -1,12 +1,12 @@
 import re
 from dataclasses import field, dataclass
 from datetime import timedelta
-from typing import Dict, Any, List, Tuple, Set, Union
+from typing import Dict, Any, List, Tuple, Set
 
 from .common import sanitize_es_result, write_to_file
-from ...appcli.data_args import DataArguments
-from ...appcli.elastic_query import ElasticQuery
-from ...appcli.iterators import DateTimeIterator, DateTimeState, RuntimeData
+from ...app.args.data import DataArguments
+from ...app.elastic_query import ElasticQuery
+from ...app.iterators import DateTimeIterator, DateTimeState, RuntimeData
 
 
 @dataclass
@@ -53,7 +53,8 @@ def return_keyword_matches(text: str, category_keywords: List[CategoryKeywords])
     return matches, categories
 
 
-def return_expression_matches(text: str, category_expressions: List[CategoryExpressions]) -> Tuple[List[str], List[str]]:
+def return_expression_matches(text: str, category_expressions: List[CategoryExpressions]) \
+        -> Tuple[List[str], List[str]]:
     matches = []
     categories = []
     for category in category_expressions:
@@ -83,6 +84,7 @@ def return_expression_matches(text: str, category_expressions: List[CategoryExpr
     return matches, categories
 
 
+# noinspection PyUnresolvedReferences,DuplicatedCode,PyGlobalUndefined
 def write(state: DateTimeState):
     global paths
     data_create_path = paths['create']['data']
@@ -97,17 +99,18 @@ def write(state: DateTimeState):
     state.runtime_data.items = []
 
 
+# noinspection PyUnresolvedReferences
 def init_item(result, state: DateTimeState) -> Tuple[Dict[str, Any], Dict[str, str], Any]:
     item = sanitize_es_result(result)
     if item is None:
         return {}, {}, None
 
     industries = {}
-    if not 'tags' in result:
+    if 'tags' not in result:
         return {}, {}, None
 
     for tag in result['tags']:
-        if not 'class' in tag or not tag['class'].endswith('.CustomerTopicGroup'):
+        if 'class' not in tag or not tag['class'].endswith('.CustomerTopicGroup'):
             continue
         if tag['uuid'] not in state.runtime_data.industries_map.keys():
             continue
@@ -123,6 +126,7 @@ def init_item(result, state: DateTimeState) -> Tuple[Dict[str, Any], Dict[str, s
     return item, industries, text
 
 
+# noinspection PyUnresolvedReferences,DuplicatedCode
 def load_data(state: DateTimeState):
     req = ElasticQuery(state.data_args.dataset_src_url, state.data_args.dataset_src_user)
     query_desc: Dict[str, Any] = state.data_args.dataset_src_query
@@ -224,11 +228,12 @@ def parse_config(runtime: EsgRuntimeData, data_args: DataArguments):
                 if span_near:
                     if runtime.expression_should:
                         runtime.expression_should += ',\n'
-                    runtime.expression_should += '{"span_near": {"slop": 0, "in_order": true, "clauses": [\n' + span_near + '\n]}}'
+                    runtime.expression_should += (
+                            '{"span_near": {"slop": 0, "in_order": true, "clauses": [\n' + span_near + '\n]}}')
 
 
-def main(data_args : DataArguments) -> None:
-    # noinspection PyGlobalUndefined
+# noinspection PyUnresolvedReferences,DuplicatedCode,PyGlobalUndefined
+def main(data_args: DataArguments) -> None:
     global logger, paths
 
     runtime = EsgRuntimeData()

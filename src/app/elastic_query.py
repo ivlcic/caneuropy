@@ -1,7 +1,7 @@
 import logging
 import os
 from datetime import timedelta, datetime
-from typing import TypeVar, Any, List, Dict, Tuple
+from typing import TypeVar, Any, List, Dict, Tuple, Optional
 
 import requests
 from requests.auth import HTTPBasicAuth
@@ -10,9 +10,10 @@ TElasticQuery = TypeVar("TElasticQuery", bound="ElasticQuery")
 
 logger = logging.getLogger('es-query')
 
+
 class ElasticQuery:
 
-    def __init__(self, url: str = None, user: str = None, passwd: str = None):
+    def __init__(self, url: str = None, user: Optional[str] = None, passwd: Optional[str] = None):
         self._user: str = user if user else os.environ.get('CPTM_SUSER', '')
         self._passwd: str = passwd if passwd else os.environ.get('CPTM_SPASS', '')
         self._url: str = url if url else os.environ.get('CPTM_SURL', 'http://localhost:9200')

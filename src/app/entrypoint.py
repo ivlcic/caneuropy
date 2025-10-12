@@ -14,8 +14,8 @@ from typing import Any, Dict, List, Tuple, Union
 import yaml
 from transformers import HfArgumentParser, TrainingArguments
 
-from .data_args import DataArguments
-from .model_args import ModelArguments
+from app.args.data import DataArguments
+from app.args.model import ModelArguments
 
 
 # ---------------------------
@@ -23,7 +23,7 @@ from .model_args import ModelArguments
 # ---------------------------
 
 def _project_paths() -> Dict[str, Path]:
-    # src/appcli/entrypoint.py -> src -> repo
+    # src/app/entrypoint.py -> src -> repo
     src_dir = Path(__file__).resolve().parents[1]
     repo = src_dir.parent
     return {
@@ -35,8 +35,10 @@ def _project_paths() -> Dict[str, Path]:
         "data": repo / "result" / "data"
     }
 
+
 def _is_pkg_dir(p: Path) -> bool:
     return p.is_dir() and (p / "__init__.py").exists()
+
 
 def _list_subactions(src: Path, script: str) -> List[str]:
     base = src / script
@@ -44,9 +46,10 @@ def _list_subactions(src: Path, script: str) -> List[str]:
         return []
     items = []
     for child in base.iterdir():
-        if child.is_dir() and  any(child.glob("*.py")):
+        if child.is_dir() and any(child.glob("*.py")):
             items.append(child.name)
     return sorted(items)
+
 
 def list_names(src: Path, script: str, sub_action: str) -> List[str]:
     base = src / script / sub_action
@@ -58,8 +61,10 @@ def list_names(src: Path, script: str, sub_action: str) -> List[str]:
             names.append(child.stem)
     return sorted(names)
 
+
 def _module_exists(module_path: str, package: Union[str, None] = None) -> bool:
     return importlib.util.find_spec(module_path, package) is not None
+
 
 # ---------------------------
 # YAML loading and merge
@@ -74,6 +79,7 @@ def _deep_merge(a: Dict[str, Any], b: Dict[str, Any]) -> Dict[str, Any]:
             out[k] = v
     return out
 
+
 def _load_yaml_if_exists(path: Path) -> Dict[str, Any]:
     if not path.exists():
         return {}
@@ -83,7 +89,9 @@ def _load_yaml_if_exists(path: Path) -> Dict[str, Any]:
         raise ValueError(f"YAML at {path} must be a mapping at top level")
     return data
 
-def _resolve_config_stack(conf_dir: Path, script: str, sub_action: str, name: str, extra_confs: List[str]) -> List[Path]:
+
+def _resolve_config_stack(conf_dir: Path, script: str, sub_action: str, name: str, extra_confs: List[str]) \
+        -> List[Path]:
     # Follow the exact order:
     # [name].yaml, each -c, then repeat in conf/{script}/, then conf/{script}/{sub_action}/
     # Accept either bare names or .yaml filenames in -c
@@ -108,8 +116,10 @@ def _resolve_config_stack(conf_dir: Path, script: str, sub_action: str, name: st
 
     return paths
 
-def _load_and_merge_configs(conf_dir: Path, script: str, sub_action: str, name: str, extra_confs: List[str]) -> Tuple[Dict[str, Any], List[Path]]:
-    name = name or sub_action  # allow missing name; but keep subaction as name default if needed
+
+def _load_and_merge_configs(conf_dir: Path, script: str, sub_action: str, name: str, extra_confs: List[str]) \
+        -> Tuple[Dict[str, Any], List[Path]]:
+    name = name or sub_action  # allow missing name; but keep subaction as a default name if needed
     files = _resolve_config_stack(conf_dir, script, sub_action, name, extra_confs)
     merged: Dict[str, Any] = {}
     loaded_files: List[Path] = []
@@ -120,11 +130,13 @@ def _load_and_merge_configs(conf_dir: Path, script: str, sub_action: str, name: 
             loaded_files.append(p)
     return merged, loaded_files
 
+
 # ---------------------------
 # Hugging Face args parsing
 # ---------------------------
 
-def _split_for_dataclasses(merged: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
+def _split_for_dataclasses(merged: Dict[str, Any]) \
+        -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
     # Try nested keys first; else fall back by pulling known fields to each dataclass
     model_keys = {f.name for f in fields(ModelArguments)}
     data_keys = {f.name for f in fields(DataArguments)}
@@ -149,12 +161,14 @@ def _split_for_dataclasses(merged: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict
 
     return model_dict, data_dict, train_dict, other
 
+
 def _parse_hf_args(merged: Dict[str, Any]) -> Tuple[ModelArguments, DataArguments, TrainingArguments, Dict[str, Any]]:
     model_dict, data_dict, train_dict, extras = _split_for_dataclasses(merged)
     parser = HfArgumentParser((ModelArguments, DataArguments))
     model_args, data_args = parser.parse_dict({**model_dict, **data_dict}, True)
     training_args = TrainingArguments(**train_dict)
     return model_args, data_args, training_args, extras
+
 
 # ---------------------------
 # Logging
@@ -202,6 +216,7 @@ def _config_logger(args, script: str, path: Path, level: str = "INFO") -> Tuple[
     logging.config.dictConfig(log_cfg)
     return logging.getLogger(logger_name), run_name
 
+
 # ---------------------------
 # Runner
 # ---------------------------
@@ -224,6 +239,7 @@ def _build_parser(script: str, src: Path) -> argparse.ArgumentParser:
             help="config file(s), order matters"
         )
     return parser
+
 
 def _ensure_dirs(paths: Dict[str, Path], sub_action: str, name: str) -> Dict[str, Dict[str, Path]]:
     run = {
@@ -253,9 +269,11 @@ def _ensure_dirs(paths: Dict[str, Path], sub_action: str, name: str) -> Dict[str
         p.mkdir(parents=True, exist_ok=True)
     return run
 
+
 def _inject_module_globals(module, g: Dict[str, Any]) -> None:
     for k, v in g.items():
         setattr(module, k, v)
+
 
 def _call_module(script: str, sub_action: str, name: str | None, module_globals: Dict[str, Any]) -> int:
     # Try verb.subaction.name first if name present and module exists
@@ -290,6 +308,7 @@ def _call_module(script: str, sub_action: str, name: str | None, module_globals:
         return fn(**kwargs)
 
     raise ImportError(f"No module to execute for {script} {sub_action} {name or ''}")
+
 
 def main(argv: List[str]) -> int:
     script = os.environ.get("APP_SCRIPT")
@@ -336,8 +355,11 @@ def main(argv: List[str]) -> int:
     # Execute
     return _call_module(script, args.sub_action, args.name, module_globals)
 
+
 # Keep imports needed by main at bottom to avoid circular
-import os, sys  # noqa: E402
+import os   # noqa: E402
+import sys  # noqa: E402
+
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))

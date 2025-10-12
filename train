@@ -8,7 +8,7 @@ sys.path.insert(0, str(repo_root / "src"))
 
 os.environ["APP_SCRIPT"] = "train"
 
-from appcli.entrypoint import main
+from app.entrypoint import main
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))

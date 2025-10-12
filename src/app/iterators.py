@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from typing import Optional, Callable, Iterator, Union, List, Dict, Any
 
-from .date_time import to_datetime
+from app.date_time import to_datetime
 
 
 @dataclass
